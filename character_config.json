@@ -1,0 +1,24 @@
+{
+  "Name": "New Character",
+  "States": {
+    "idle": {
+      "Name": "idle",
+      "Frames": [
+        {
+          "ImagePath": "C:\\Users\\yahir\\Documents\\Proyectos Personales\\PNGT\\Pruebas\\idle.png",
+          "DurationMS": 100
+        }
+      ]
+    },
+    "talking": {
+      "Name": "talking",
+      "Frames": [
+        {
+          "ImagePath": "C:\\Users\\yahir\\Documents\\Proyectos Personales\\PNGT\\Pruebas\\talking.png",
+          "DurationMS": 100
+        }
+      ]
+    }
+  },
+  "AudioThreshold": 0.17264286
+}

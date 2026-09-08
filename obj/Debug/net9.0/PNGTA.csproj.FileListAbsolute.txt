@@ -1,0 +1,7 @@
+C:\Users\yahir\Documents\Proyectos Personales\PNGT\PNGTA\obj\Debug\net9.0\PNGTA.csproj.AssemblyReference.cache
+C:\Users\yahir\Documents\Proyectos Personales\PNGT\PNGTA\obj\Debug\net9.0\Avalonia\Resources.Inputs.cache
+C:\Users\yahir\Documents\Proyectos Personales\PNGT\PNGTA\obj\Debug\net9.0\Avalonia\resources
+C:\Users\yahir\Documents\Proyectos Personales\PNGT\PNGTA\obj\Debug\net9.0\PNGTA.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\yahir\Documents\Proyectos Personales\PNGT\PNGTA\obj\Debug\net9.0\PNGTA.AssemblyInfoInputs.cache
+C:\Users\yahir\Documents\Proyectos Personales\PNGT\PNGTA\obj\Debug\net9.0\PNGTA.AssemblyInfo.cs
+C:\Users\yahir\Documents\Proyectos Personales\PNGT\PNGTA\obj\Debug\net9.0\PNGTA.csproj.CoreCompileInputs.cache

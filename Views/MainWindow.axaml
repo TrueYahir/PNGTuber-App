@@ -1,0 +1,169 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:PNGTA.ViewModels"
+        x:Class="PNGTA.Views.MainWindow"
+        x:DataType="vm:MainViewModel"
+        Width="1100" Height="700"
+        Title="PNGTuber Editor"
+        WindowStartupLocation="CenterScreen">
+
+    <Grid ColumnDefinitions="*, 450" Margin="20" ColumnSpacing="20">
+        
+        <Grid Grid.Column="0" RowDefinitions="Auto, *">
+            <StackPanel Grid.Row="0" Orientation="Horizontal" Spacing="10" Margin="0,0,0,10" HorizontalAlignment="Center">
+                <TextBlock Text="Test Reaction:" VerticalAlignment="Center" FontWeight="Bold"/>
+                <ComboBox ItemsSource="{Binding AvailableStates}" SelectedItem="{Binding SelectedPreviewState}" Width="150"/>
+            </StackPanel>
+            
+            <Border Grid.Row="1" BorderBrush="White" BorderThickness="2" Background="#121212">
+                <Image Source="{Binding PreviewImage}" Stretch="Uniform" Margin="10"/>
+            </Border>
+        </Grid>
+
+        <Grid Grid.Column="1" RowDefinitions="Auto, *, Auto">
+            
+            <StackPanel Grid.Row="0" Margin="0,0,0,20">
+                <TextBlock Text="Audio Setup" FontSize="16" Margin="0,0,0,5"/>
+                <ComboBox ItemsSource="{Binding AudioDevices}" 
+                          SelectedItem="{Binding SelectedAudioDevice}" 
+                          Width="400" Margin="0,0,0,15"/>
+                
+                <TextBlock Text="{Binding Threshold, StringFormat='Microphone Threshold: {0:F2}'}" Margin="0,0,0,5"/>
+                <Slider Minimum="0.01" Maximum="1.0" Value="{Binding Threshold}" Width="400" HorizontalAlignment="Left"/>
+            </StackPanel>
+
+            <ScrollViewer Grid.Row="1" Margin="0,0,0,20">
+                <StackPanel Spacing="15">
+                    <TextBlock Text="Character States" FontSize="16"/>
+                    
+                    <Border BorderBrush="White" BorderThickness="2" Padding="10">
+                        <Grid ColumnDefinitions="*, Auto">
+                            <StackPanel Grid.Column="0" VerticalAlignment="Center" Spacing="5" Margin="0,0,15,0">
+                                <TextBlock Text="IDLE" FontSize="14" FontWeight="Bold"/>
+                                <Grid ColumnDefinitions="*, Auto" ColumnSpacing="5">
+                                    <TextBox Grid.Column="0" Text="{Binding IdleImagePath}" IsReadOnly="True" MinWidth="150"/>
+                                    <Button Grid.Column="1" Content="..." Click="OnBrowseStateClick" Tag="Idle"/>
+                                </Grid>
+                            </StackPanel>
+                            <Border Grid.Column="1" Width="80" Height="80" BorderBrush="White" BorderThickness="1" Background="#1E1E1E">
+                                <Image Source="{Binding IdleBitmap}" Stretch="Uniform"/>
+                            </Border>
+                        </Grid>
+                    </Border>
+
+                    <Border BorderBrush="White" BorderThickness="2" Padding="10">
+                        <Grid ColumnDefinitions="*, Auto">
+                            <StackPanel Grid.Column="0" VerticalAlignment="Center" Spacing="5" Margin="0,0,15,0">
+                                <TextBlock Text="TALKING" FontSize="14" FontWeight="Bold"/>
+                                <Grid ColumnDefinitions="*, Auto" ColumnSpacing="5">
+                                    <TextBox Grid.Column="0" Text="{Binding TalkingImagePath}" IsReadOnly="True" MinWidth="150"/>
+                                    <Button Grid.Column="1" Content="..." Click="OnBrowseStateClick" Tag="Talking"/>
+                                </Grid>
+                            </StackPanel>
+                            <Border Grid.Column="1" Width="80" Height="80" BorderBrush="White" BorderThickness="1" Background="#1E1E1E">
+                                <Image Source="{Binding TalkingBitmap}" Stretch="Uniform"/>
+                            </Border>
+                        </Grid>
+                    </Border>
+
+                    <Border BorderBrush="White" BorderThickness="2" Padding="10">
+                        <Grid ColumnDefinitions="*, Auto">
+                            <StackPanel Grid.Column="0" VerticalAlignment="Center" Spacing="5" Margin="0,0,15,0">
+                                <TextBlock Text="SAD" FontSize="14" FontWeight="Bold"/>
+                                <Grid ColumnDefinitions="*, Auto" ColumnSpacing="5">
+                                    <TextBox Grid.Column="0" Text="{Binding SadImagePath}" IsReadOnly="True" MinWidth="150"/>
+                                    <Button Grid.Column="1" Content="..." Click="OnBrowseStateClick" Tag="Sad"/>
+                                </Grid>
+                            </StackPanel>
+                            <Border Grid.Column="1" Width="80" Height="80" BorderBrush="White" BorderThickness="1" Background="#1E1E1E">
+                                <Image Source="{Binding SadBitmap}" Stretch="Uniform"/>
+                            </Border>
+                        </Grid>
+                    </Border>
+
+                    <Border BorderBrush="White" BorderThickness="2" Padding="10">
+                        <Grid ColumnDefinitions="*, Auto">
+                            <StackPanel Grid.Column="0" VerticalAlignment="Center" Spacing="5" Margin="0,0,15,0">
+                                <TextBlock Text="CRYING" FontSize="14" FontWeight="Bold"/>
+                                <Grid ColumnDefinitions="*, Auto" ColumnSpacing="5">
+                                    <TextBox Grid.Column="0" Text="{Binding CryingImagePath}" IsReadOnly="True" MinWidth="150"/>
+                                    <Button Grid.Column="1" Content="..." Click="OnBrowseStateClick" Tag="Crying"/>
+                                </Grid>
+                            </StackPanel>
+                            <Border Grid.Column="1" Width="80" Height="80" BorderBrush="White" BorderThickness="1" Background="#1E1E1E">
+                                <Image Source="{Binding CryingBitmap}" Stretch="Uniform"/>
+                            </Border>
+                        </Grid>
+                    </Border>
+
+                    <Border BorderBrush="White" BorderThickness="2" Padding="10">
+                        <Grid ColumnDefinitions="*, Auto">
+                            <StackPanel Grid.Column="0" VerticalAlignment="Center" Spacing="5" Margin="0,0,15,0">
+                                <TextBlock Text="MAD" FontSize="14" FontWeight="Bold"/>
+                                <Grid ColumnDefinitions="*, Auto" ColumnSpacing="5">
+                                    <TextBox Grid.Column="0" Text="{Binding MadImagePath}" IsReadOnly="True" MinWidth="150"/>
+                                    <Button Grid.Column="1" Content="..." Click="OnBrowseStateClick" Tag="Mad"/>
+                                </Grid>
+                            </StackPanel>
+                            <Border Grid.Column="1" Width="80" Height="80" BorderBrush="White" BorderThickness="1" Background="#1E1E1E">
+                                <Image Source="{Binding MadBitmap}" Stretch="Uniform"/>
+                            </Border>
+                        </Grid>
+                    </Border>
+
+                    <Border BorderBrush="White" BorderThickness="2" Padding="10">
+                        <Grid ColumnDefinitions="*, Auto">
+                            <StackPanel Grid.Column="0" VerticalAlignment="Center" Spacing="5" Margin="0,0,15,0">
+                                <TextBlock Text="ANGRY" FontSize="14" FontWeight="Bold"/>
+                                <Grid ColumnDefinitions="*, Auto" ColumnSpacing="5">
+                                    <TextBox Grid.Column="0" Text="{Binding AngryImagePath}" IsReadOnly="True" MinWidth="150"/>
+                                    <Button Grid.Column="1" Content="..." Click="OnBrowseStateClick" Tag="Angry"/>
+                                </Grid>
+                            </StackPanel>
+                            <Border Grid.Column="1" Width="80" Height="80" BorderBrush="White" BorderThickness="1" Background="#1E1E1E">
+                                <Image Source="{Binding AngryBitmap}" Stretch="Uniform"/>
+                            </Border>
+                        </Grid>
+                    </Border>
+
+                    <Border BorderBrush="White" BorderThickness="2" Padding="10">
+                        <Grid ColumnDefinitions="*, Auto">
+                            <StackPanel Grid.Column="0" VerticalAlignment="Center" Spacing="5" Margin="0,0,15,0">
+                                <TextBlock Text="LAUGH" FontSize="14" FontWeight="Bold"/>
+                                <Grid ColumnDefinitions="*, Auto" ColumnSpacing="5">
+                                    <TextBox Grid.Column="0" Text="{Binding LaughImagePath}" IsReadOnly="True" MinWidth="150"/>
+                                    <Button Grid.Column="1" Content="..." Click="OnBrowseStateClick" Tag="Laugh"/>
+                                </Grid>
+                            </StackPanel>
+                            <Border Grid.Column="1" Width="80" Height="80" BorderBrush="White" BorderThickness="1" Background="#1E1E1E">
+                                <Image Source="{Binding LaughBitmap}" Stretch="Uniform"/>
+                            </Border>
+                        </Grid>
+                    </Border>
+
+                    <Border BorderBrush="White" BorderThickness="2" Padding="10">
+                        <Grid ColumnDefinitions="*, Auto">
+                            <StackPanel Grid.Column="0" VerticalAlignment="Center" Spacing="5" Margin="0,0,15,0">
+                                <TextBlock Text="THINKING" FontSize="14" FontWeight="Bold"/>
+                                <Grid ColumnDefinitions="*, Auto" ColumnSpacing="5">
+                                    <TextBox Grid.Column="0" Text="{Binding ThinkingImagePath}" IsReadOnly="True" MinWidth="150"/>
+                                    <Button Grid.Column="1" Content="..." Click="OnBrowseStateClick" Tag="Thinking"/>
+                                </Grid>
+                            </StackPanel>
+                            <Border Grid.Column="1" Width="80" Height="80" BorderBrush="White" BorderThickness="1" Background="#1E1E1E">
+                                <Image Source="{Binding ThinkingBitmap}" Stretch="Uniform"/>
+                            </Border>
+                        </Grid>
+                    </Border>
+                </StackPanel>
+            </ScrollViewer>
+
+            <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10">
+                <Button Content="Import Avatar" Click="OnImportClick" BorderBrush="White" BorderThickness="2" Padding="15,8"/>
+                <Button Content="Export Avatar" Click="OnExportClick" BorderBrush="White" BorderThickness="2" Padding="15,8"/>
+                <Button Content="Launch" Click="OnLaunchAvatarClick" BorderBrush="White" BorderThickness="2" Padding="15,8" Background="#0078D7"/>
+            </StackPanel>
+            
+        </Grid>
+    </Grid>
+</Window>
