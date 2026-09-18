@@ -1,3 +1,4 @@
+using System;
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
@@ -5,14 +6,12 @@ using Microsoft.Extensions.DependencyInjection;
 using PNGTA.Services;
 using PNGTA.ViewModels;
 using PNGTA.Views;
-using System;
 
 namespace PNGTA;
 
 public partial class App : Application
 {
-    public new static App Current => (App)Application.Current!;
-    public IServiceProvider Services { get; private set; } = null!;
+    public IServiceProvider? Services { get; private set; }
 
     public override void Initialize()
     {
@@ -25,6 +24,7 @@ public partial class App : Application
         
         services.AddSingleton<IAudioService, NAudioService>();
         services.AddSingleton<AvatarProjectService>();
+        services.AddSingleton<AppSettingsService>(); 
         
         services.AddTransient<MainViewModel>();
         services.AddTransient<PngTuberViewModel>();

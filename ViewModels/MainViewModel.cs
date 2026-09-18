@@ -40,12 +40,14 @@ public partial class MainViewModel : ViewModelBase, IDisposable
     [ObservableProperty] private Bitmap? _angryBitmap;
     [ObservableProperty] private Bitmap? _laughBitmap;
     [ObservableProperty] private Bitmap? _thinkingBitmap;
+    [ObservableProperty] private LayerModel? _selectedLayer;
 
     public ObservableCollection<string> AudioDevices { get; } = new();
     public ObservableCollection<string> AvailableStates { get; } = new() 
     { 
         "Idle", "Talking", "Sad", "Crying", "Mad", "Angry", "Laugh", "Thinking" 
     };
+    public ObservableCollection<LayerModel> Layers { get; } = new();
 
     private bool _wasTalking;
 
@@ -167,6 +169,12 @@ public partial class MainViewModel : ViewModelBase, IDisposable
         AddState("Laugh", LaughImagePath);
         AddState("Thinking", ThinkingImagePath);
 
+        config.Layers = new List<LayerConfig>();
+        foreach (var layer in Layers)
+        {
+            config.Layers.Add(MapLayerToConfig(layer));
+        }
+
         return config;
     }
 
@@ -186,10 +194,109 @@ public partial class MainViewModel : ViewModelBase, IDisposable
         UpdateImagePath("Angry", GetPath("angry"));
         UpdateImagePath("Laugh", GetPath("laugh"));
         UpdateImagePath("Thinking", GetPath("thinking"));
+
+        Layers.Clear();
+        if (config.Layers != null)
+        {
+            foreach (var layerConfig in config.Layers)
+            {
+                Layers.Add(MapConfigToLayer(layerConfig, null));
+            }
+        }
+    }
+
+    private LayerConfig MapLayerToConfig(LayerModel model)
+    {
+        var config = new LayerConfig
+        {
+            Name = model.Name,
+            ImagePath = model.ImagePath,
+            IsVisible = model.IsVisible,
+            IsLocked = model.IsLocked,
+            PositionX = model.PositionX,
+            PositionY = model.PositionY,
+            ScaleX = model.ScaleX,
+            ScaleY = model.ScaleY,
+            Rotation = model.Rotation
+        };
+
+        foreach (var child in model.Children)
+        {
+            config.Children.Add(MapLayerToConfig(child));
+        }
+
+        return config;
+    }
+
+    private LayerModel MapConfigToLayer(LayerConfig config, LayerModel? parent)
+    {
+        var model = new LayerModel
+        {
+            Name = config.Name,
+            ImagePath = config.ImagePath,
+            IsVisible = config.IsVisible,
+            IsLocked = config.IsLocked,
+            PositionX = config.PositionX,
+            PositionY = config.PositionY,
+            ScaleX = config.ScaleX,
+            ScaleY = config.ScaleY,
+            Rotation = config.Rotation,
+            Parent = parent
+        };
+
+        if (!string.IsNullOrEmpty(model.ImagePath))
+        {
+            try 
+            { 
+                model.ImageBitmap = new Bitmap(model.ImagePath); 
+            } 
+            catch { }
+        }
+
+        if (config.Children != null)
+        {
+            foreach (var childConfig in config.Children)
+            {
+                model.Children.Add(MapConfigToLayer(childConfig, model));
+            }
+        }
+
+        return model;
     }
 
     public void Dispose()
     {
         _timer.Stop();
+    }
+    
+    public void AddNewLayer()
+    {
+        Layers.Add(new LayerModel { Name = "New Layer" });
+    }
+
+    public void RemoveSelectedLayer()
+    {
+        if (SelectedLayer != null)
+        {
+            RemoveLayerRecursive(Layers, SelectedLayer);
+            SelectedLayer = null;
+        }
+    }
+
+    private bool RemoveLayerRecursive(ObservableCollection<LayerModel> list, LayerModel target)
+    {
+        if (list.Contains(target))
+        {
+            list.Remove(target);
+            return true;
+        }
+        foreach (var layer in list)
+        {
+            if (RemoveLayerRecursive(layer.Children, target))
+            {
+                return true;
+            }
+        }
+        return false;
     }
 }

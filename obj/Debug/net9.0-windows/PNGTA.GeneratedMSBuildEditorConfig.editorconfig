@@ -9,7 +9,7 @@ build_property.AvaloniaNameGeneratorAttachDevTools = true
 build_property.AvaloniaUseCompiledBindingsByDefault = true
 build_property.AvaloniaMainPackageVersion = 12.1.1
 build_property.AvaloniaPreviewerNetCoreToolPath = C:\Users\yahir\.nuget\packages\avalonia\12.1.1\buildTransitive\\..\tools\net8.0\designer\Avalonia.Designer.HostApp.dll
-build_property.AvaloniaResourcePaths = C:\Users\yahir\Documents\Proyectos Personales\PNGT\PNGTA\Assets\avalonia-logo.ico
+build_property.AvaloniaResourcePaths = C:\Users\yahir\Documents\Proyectos Personales\PNGT\PNGTA\Assets\avalonia-logo.ico,C:\Users\yahir\Documents\Proyectos Personales\PNGT\PNGTA\App.axaml,C:\Users\yahir\Documents\Proyectos Personales\PNGT\PNGTA\Views\MainWindow.axaml,C:\Users\yahir\Documents\Proyectos Personales\PNGT\PNGTA\Views\PngTuberWindow.axaml,C:\Users\yahir\Documents\Proyectos Personales\PNGT\PNGTA\Views\SettingsWindow.axaml
 build_property.MvvmToolkitEnableINotifyPropertyChangingSupport = true
 build_property._MvvmToolkitIsUsingWindowsRuntimePack = false
 build_property.CsWinRTComponent = 
@@ -38,4 +38,7 @@ build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml
 build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml
 
 [C:/Users/yahir/Documents/Proyectos Personales/PNGT/PNGTA/Views/PngTuberWindow.axaml]
+build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml
+
+[C:/Users/yahir/Documents/Proyectos Personales/PNGT/PNGTA/Views/SettingsWindow.axaml]
 build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml

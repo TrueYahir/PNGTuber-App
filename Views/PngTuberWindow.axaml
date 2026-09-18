@@ -7,7 +7,7 @@
         Title="Avatar"
         Background="#80000000"
         TransparencyLevelHint="Transparent"
-        SystemDecorations="None"
+        WindowDecorations="None"
         Topmost="True"
         WindowStartupLocation="CenterScreen">
     

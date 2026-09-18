@@ -100,3 +100,4 @@ C:\Users\yahir\Documents\Proyectos Personales\PNGT\PNGTA\obj\Debug\net9.0-window
 C:\Users\yahir\Documents\Proyectos Personales\PNGT\PNGTA\obj\Debug\net9.0-windows\PNGTA.pdb
 C:\Users\yahir\Documents\Proyectos Personales\PNGT\PNGTA\obj\Debug\net9.0-windows\PNGTA.genruntimeconfig.cache
 C:\Users\yahir\Documents\Proyectos Personales\PNGT\PNGTA\obj\Debug\net9.0-windows\ref\PNGTA.dll
+C:\Users\yahir\Documents\Proyectos Personales\PNGT\PNGTA\obj\Debug\net9.0-windows\PNGTA.sourcelink.json

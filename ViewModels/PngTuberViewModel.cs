@@ -1,7 +1,9 @@
 using System;
+using System.Collections.Generic;
 using Avalonia.Media.Imaging;
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
+using PNGTA.Models;
 using PNGTA.Services;
 
 namespace PNGTA.ViewModels;
@@ -14,8 +16,8 @@ public partial class PngTuberViewModel : ViewModelBase, IDisposable
     [ObservableProperty]
     private Bitmap? _currentImage;
 
-    private Bitmap? _idleBitmap;
-    private Bitmap? _talkingBitmap;
+    private readonly Dictionary<string, Bitmap> _stateBitmaps = new();
+    private string _currentEmotion = "idle";
     private bool _wasTalking = false;
 
     public PngTuberViewModel(IAudioService audioService)
@@ -29,20 +31,35 @@ public partial class PngTuberViewModel : ViewModelBase, IDisposable
         _timer.Tick += UpdateState;
     }
 
-    public void LoadImages(string idlePath, string talkingPath)
+    public void LoadConfig(CharacterConfig config)
     {
-        try
+        _stateBitmaps.Clear();
+        _currentEmotion = "idle";
+
+        foreach (var state in config.States)
         {
-            _idleBitmap = new Bitmap(idlePath);
-            _talkingBitmap = new Bitmap(talkingPath);
-            CurrentImage = _idleBitmap;
-            
-            _audioService.StartCapture();
-            _timer.Start();
+            if (state.Value.Frames.Count > 0 && !string.IsNullOrEmpty(state.Value.Frames[0].ImagePath))
+            {
+                try
+                {
+                    _stateBitmaps[state.Key] = new Bitmap(state.Value.Frames[0].ImagePath);
+                }
+                catch { }
+            }
         }
-        catch (Exception ex)
+
+        SetEmotion("idle");
+        _audioService.StartCapture();
+        _timer.Start();
+    }
+
+    public void SetEmotion(string emotionName)
+    {
+        emotionName = emotionName.ToLower();
+        if (_stateBitmaps.ContainsKey(emotionName))
         {
-            Console.WriteLine($"Error cargando imágenes: {ex.Message}");
+            _currentEmotion = emotionName;
+            ForceUpdateImage(_audioService.IsTalking);
         }
     }
 
@@ -52,14 +69,31 @@ public partial class PngTuberViewModel : ViewModelBase, IDisposable
         
         if (isTalkingNow != _wasTalking)
         {
-            CurrentImage = isTalkingNow ? _talkingBitmap : _idleBitmap;
+            ForceUpdateImage(isTalkingNow);
             _wasTalking = isTalkingNow;
+        }
+    }
+
+    private void ForceUpdateImage(bool isTalking)
+    {
+        if (isTalking && _currentEmotion == "idle" && _stateBitmaps.TryGetValue("talking", out var talkingBmp))
+        {
+            CurrentImage = talkingBmp;
+            return;
+        }
+
+        if (_stateBitmaps.TryGetValue(_currentEmotion, out var emotionBmp))
+        {
+            CurrentImage = emotionBmp;
+        }
+        else if (_stateBitmaps.TryGetValue("idle", out var idleBmp))
+        {
+            CurrentImage = idleBmp;
         }
     }
 
     public void Dispose()
     {
         _timer.Stop();
-        _audioService.StopCapture();
     }
 }

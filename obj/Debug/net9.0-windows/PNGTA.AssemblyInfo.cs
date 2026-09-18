@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("PNGTA")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+125aa80f92538d2ee9748a4319c51c8d01d4a9be")]
 [assembly: System.Reflection.AssemblyProductAttribute("PNGTA")]
 [assembly: System.Reflection.AssemblyTitleAttribute("PNGTA")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
