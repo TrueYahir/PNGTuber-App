@@ -17,3 +17,14 @@
 - Configured the Transformation panel to render only when an active layer is selected.
 - Translated all user interface elements, tooltips, and file dialogs to English.
 - Optimized drag-and-drop logic with a descendant check to prevent recursive infinite loops when moving layers.
+
+
+## 19-09-2026
+### Added
+- Added a file browser button to the Image Override Path in the Animations tab to natively select system images.
+
+### Changed
+- Converted the Target Layer Name field from a manual text input into a dropdown menu that automatically populates with active layers.
+
+### Fixed
+- Resolved an invalid cast exception in the Playback Mode dropdown to ensure animation loop states apply correctly.

@@ -11,7 +11,7 @@
 
     <Window.Resources>
         <DataTemplate x:Key="RecursiveLayerTemplate" x:DataType="models:LayerModel">
-            <Panel IsVisible="{Binding IsVisible}">
+            <Panel IsVisible="{Binding IsVisible}" ZIndex="{Binding ZIndex}" Opacity="{Binding Opacity}">
                 <Panel.RenderTransform>
                     <TransformGroup>
                         <TranslateTransform X="{Binding PositionX}" Y="{Binding PositionY}"/>
@@ -19,7 +19,7 @@
                         <RotateTransform Angle="{Binding Rotation}"/>
                     </TransformGroup>
                 </Panel.RenderTransform>
-                <Image Source="{Binding ImageBitmap}" Stretch="Uniform" IsHitTestVisible="False"/>
+                <Image Source="{Binding ImageBitmap}" Stretch="Uniform" PointerPressed="OnCanvasLayerPointerPressed" Tag="{Binding}"/>
                 <ItemsControl ItemsSource="{Binding Children}" ItemTemplate="{StaticResource RecursiveLayerTemplate}"/>
             </Panel>
         </DataTemplate>
@@ -99,16 +99,23 @@
             </Menu>
         </DockPanel>
 
-        <Grid Grid.Row="1" ColumnDefinitions="*, 450" Margin="20" ColumnSpacing="20">
+        <Grid Grid.Row="1" Margin="20">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" MinWidth="200" />
+                <ColumnDefinition Width="5" />
+                <ColumnDefinition Width="450" MinWidth="350" />
+            </Grid.ColumnDefinitions>
             
-            <Border Grid.Column="0" Background="#151515" CornerRadius="12" Padding="20" ClipToBounds="True">
+            <Border Grid.Column="0" Background="#151515" CornerRadius="12" Padding="20" ClipToBounds="True" Margin="0,0,10,0">
                 <Grid>
                     <Image Source="{Binding PreviewImage}" Stretch="Uniform" Opacity="0.5"/>
                     <ItemsControl ItemsSource="{Binding Layers}" ItemTemplate="{StaticResource RecursiveLayerTemplate}"/>
                 </Grid>
             </Border>
 
-            <Grid Grid.Column="1" RowDefinitions="*, Auto">
+            <GridSplitter Grid.Column="1" Background="#2A2A2A" ResizeDirection="Columns" CornerRadius="2" Margin="5,0"/>
+
+            <Grid Grid.Column="2" RowDefinitions="*, Auto" Margin="10,0,0,0">
                 
                 <TabControl Grid.Row="0" Margin="0,0,0,20">
                     
@@ -243,6 +250,7 @@
                             <Grid Grid.Row="0" RowDefinitions="Auto, *">
                                 <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Right" Spacing="5" Margin="0,10">
                                     <Button Content="+" Command="{Binding AddNewLayer}" Width="35" Classes="ModernBtn"/>
+                                    <Button Content="D" Command="{Binding DuplicateSelectedLayer}" Width="35" Classes="ModernBtn" ToolTip.Tip="Duplicate Layer"/>
                                     <Button Content="-" Command="{Binding RemoveSelectedLayer}" Width="35" Classes="ModernBtn"/>
                                 </StackPanel>
                                 
@@ -267,6 +275,17 @@
                                     
                                     <TextBlock Text="Name" Foreground="#AAAAAA" FontSize="12"/>
                                     <TextBox Text="{Binding Name}"/>
+
+                                    <Grid ColumnDefinitions="*, *" ColumnSpacing="10" Margin="0,10,0,0">
+                                        <StackPanel Grid.Column="0">
+                                            <TextBlock Text="Opacity" Foreground="#AAAAAA" FontSize="12"/>
+                                            <NumericUpDown Value="{Binding Opacity}" Increment="0.1" Minimum="0" Maximum="1" FormatString="0.0"/>
+                                        </StackPanel>
+                                        <StackPanel Grid.Column="1">
+                                            <TextBlock Text="Z-Order" Foreground="#AAAAAA" FontSize="12"/>
+                                            <NumericUpDown Value="{Binding ZIndex}" Increment="1"/>
+                                        </StackPanel>
+                                    </Grid>
 
                                     <TextBlock Text="Image Path" Foreground="#AAAAAA" FontSize="12" Margin="0,10,0,0"/>
                                     <Grid ColumnDefinitions="*, Auto" ColumnSpacing="5">
@@ -300,6 +319,165 @@
                                         <TextBlock Text="Rotation" Foreground="#AAAAAA" FontSize="12"/>
                                         <NumericUpDown Value="{Binding Rotation}" Increment="1"/>
                                     </StackPanel>
+                                </StackPanel>
+                            </Border>
+                        </Grid>
+                    </TabItem>
+
+                    <TabItem Header="Animations">
+                        <Grid RowDefinitions="Auto, *, Auto">
+                            <StackPanel Grid.Row="0" Orientation="Horizontal" Spacing="5" Margin="0,10">
+                                <Button Content="Add Anim" Command="{Binding AddNewAnimation}" Classes="ModernBtn" Padding="10,5"/>
+                                <Button Content="Duplicate" Command="{Binding DuplicateSelectedAnimation}" Classes="ModernBtn" Padding="10,5"/>
+                                <Button Content="Remove" Command="{Binding RemoveSelectedAnimation}" Classes="ModernBtn" Padding="10,5"/>
+                                <TextBlock Text="|" VerticalAlignment="Center" Foreground="#555555" Margin="5,0"/>
+                                <Button Content="Play" Command="{Binding PlaySelectedAnimation}" Classes="PrimaryBtn" Padding="10,5"/>
+                                <Button Content="Pause" Command="{Binding PauseSelectedAnimation}" Classes="ModernBtn" Padding="10,5"/>
+                                <Button Content="Stop" Command="{Binding StopSelectedAnimation}" Classes="ModernBtn" Padding="10,5"/>
+                                <Button Content="Restart" Command="{Binding RestartSelectedAnimation}" Classes="ModernBtn" Padding="10,5"/>
+                            </StackPanel>
+
+                            <Grid Grid.Row="1" ColumnDefinitions="250, *">
+                                <ListBox Grid.Column="0" ItemsSource="{Binding Animations}" SelectedItem="{Binding SelectedAnimation}" Background="#121212" CornerRadius="8">
+                                    <ListBox.ItemTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Text="{Binding Name}" Padding="5"/>
+                                        </DataTemplate>
+                                    </ListBox.ItemTemplate>
+                                </ListBox>
+
+                                <Border Grid.Column="1" Background="#1A1A1A" CornerRadius="10" Padding="15" Margin="10,0,0,0"
+                                        IsVisible="{Binding SelectedAnimation, Converter={x:Static ObjectConverters.IsNotNull}}">
+                                    <Grid RowDefinitions="Auto, *">
+                                        <StackPanel Grid.Row="0" DataContext="{Binding SelectedAnimation}" Spacing="10" Margin="0,0,0,15">
+                                            <Grid ColumnDefinitions="*, *, *">
+                                                <StackPanel Grid.Column="0" Margin="0,0,5,0">
+                                                    <TextBlock Text="Animation Name" Foreground="#AAAAAA" FontSize="12"/>
+                                                    <TextBox Text="{Binding Name}"/>
+                                                </StackPanel>
+                                                <StackPanel Grid.Column="1" Margin="5,0,5,0">
+                                                    <TextBlock Text="Playback Mode" Foreground="#AAAAAA" FontSize="12"/>
+                                                    <ComboBox SelectedIndex="{Binding PlaybackMode}" HorizontalAlignment="Stretch">
+                                                        <x:String>Loop</x:String>
+                                                        <x:String>PingPong</x:String>
+                                                        <x:String>OneShot</x:String>
+                                                    </ComboBox>
+                                                </StackPanel>
+                                                <StackPanel Grid.Column="2" Margin="5,0,0,0">
+                                                    <TextBlock Text="Priority" Foreground="#AAAAAA" FontSize="12"/>
+                                                    <NumericUpDown Value="{Binding Priority}" Increment="1"/>
+                                                </StackPanel>
+                                            </Grid>
+                                        </StackPanel>
+
+                                        <Grid Grid.Row="1" ColumnDefinitions="250, *">
+                                            <Grid Grid.Column="0" RowDefinitions="Auto, *">
+                                                <StackPanel Grid.Row="0" Orientation="Horizontal" Spacing="5" Margin="0,0,0,10">
+                                                    <Button Content="Add Frame" Command="{Binding AddFrameToSelectedAnimation}" Classes="ModernBtn"/>
+                                                    <Button Content="Remove" Command="{Binding RemoveSelectedFrame}" Classes="ModernBtn"/>
+                                                </StackPanel>
+                                                <ListBox Grid.Row="1" ItemsSource="{Binding SelectedAnimation.Frames}" SelectedItem="{Binding SelectedFrame}" Background="#121212" CornerRadius="8">
+                                                    <ListBox.ItemTemplate>
+                                                        <DataTemplate>
+                                                            <TextBlock Text="{Binding LayerName, StringFormat='Target: {0}'}" Padding="5"/>
+                                                        </DataTemplate>
+                                                    </ListBox.ItemTemplate>
+                                                </ListBox>
+                                            </Grid>
+
+                                            <Border Grid.Column="1" Background="#222222" CornerRadius="8" Padding="15" Margin="10,0,0,0"
+                                                    IsVisible="{Binding SelectedFrame, Converter={x:Static ObjectConverters.IsNotNull}}">
+                                                <ScrollViewer>
+                                                    <StackPanel DataContext="{Binding SelectedFrame}" Spacing="10">
+                                                        <Grid ColumnDefinitions="*, *">
+                                                            <StackPanel Grid.Column="0" Margin="0,0,5,0">
+                                                                <TextBlock Text="Target Layer Name" Foreground="#AAAAAA" FontSize="12"/>
+                                                                <ComboBox SelectedValue="{Binding LayerName}" 
+                                                                        SelectedValueBinding="{Binding Name}"
+                                                                        ItemsSource="{Binding $parent[Window].DataContext.Layers}" 
+                                                                        HorizontalAlignment="Stretch">
+                                                                    <ComboBox.ItemTemplate>
+                                                                        <DataTemplate>
+                                                                            <TextBlock Text="{Binding Name}"/>
+                                                                        </DataTemplate>
+                                                                    </ComboBox.ItemTemplate>
+                                                                </ComboBox>
+                                                            </StackPanel>
+                                                            <StackPanel Grid.Column="1" Margin="5,0,0,0">
+                                                                <TextBlock Text="Duration (ms)" Foreground="#AAAAAA" FontSize="12"/>
+                                                                <NumericUpDown Value="{Binding DurationMs}" Increment="10"/>
+                                                            </StackPanel>
+                                                        </Grid>
+
+                                                        <TextBlock Text="Image Override Path (Optional)" Foreground="#AAAAAA" FontSize="12" Margin="0,10,0,0"/>
+                                                        <Grid ColumnDefinitions="*, Auto" ColumnSpacing="5">
+                                                            <TextBox Grid.Column="0" Text="{Binding ImagePath}" IsReadOnly="True" Background="#121212" BorderThickness="0" CornerRadius="4"/>
+                                                            <Button Grid.Column="1" Content="..." Click="OnBrowseFrameImageClick" Classes="ModernBtn"/>
+                                                        </Grid>
+                                                        <TextBox Text="{Binding ImagePath}"/>
+                                                        
+                                                        <Grid ColumnDefinitions="*, *" ColumnSpacing="10" Margin="0,10,0,0">
+                                                            <StackPanel Grid.Column="0">
+                                                                <TextBlock Text="Position X" Foreground="#AAAAAA" FontSize="12"/>
+                                                                <NumericUpDown Value="{Binding PositionX}"/>
+                                                            </StackPanel>
+                                                            <StackPanel Grid.Column="1">
+                                                                <TextBlock Text="Position Y" Foreground="#AAAAAA" FontSize="12"/>
+                                                                <NumericUpDown Value="{Binding PositionY}"/>
+                                                            </StackPanel>
+                                                        </Grid>
+                                                        
+                                                        <Grid ColumnDefinitions="*, *" ColumnSpacing="10" Margin="0,10,0,0">
+                                                            <StackPanel Grid.Column="0">
+                                                                <TextBlock Text="Scale X" Foreground="#AAAAAA" FontSize="12"/>
+                                                                <NumericUpDown Value="{Binding ScaleX}" Increment="0.05" FormatString="0.00"/>
+                                                            </StackPanel>
+                                                            <StackPanel Grid.Column="1">
+                                                                <TextBlock Text="Scale Y" Foreground="#AAAAAA" FontSize="12"/>
+                                                                <NumericUpDown Value="{Binding ScaleY}" Increment="0.05" FormatString="0.00"/>
+                                                            </StackPanel>
+                                                        </Grid>
+
+                                                        <StackPanel Margin="0,10,0,0">
+                                                            <TextBlock Text="Rotation" Foreground="#AAAAAA" FontSize="12"/>
+                                                            <NumericUpDown Value="{Binding Rotation}" Increment="1"/>
+                                                        </StackPanel>
+                                                    </StackPanel>
+                                                </ScrollViewer>
+                                            </Border>
+                                        </Grid>
+                                    </Grid>
+                                </Border>
+                            </Grid>
+
+                            <Border Grid.Row="2" Background="#1A1A1A" CornerRadius="10" Padding="15" Margin="0,10,0,0">
+                                <StackPanel DataContext="{Binding BlinkSettings}" Spacing="10">
+                                    <TextBlock Text="Automatic Blinking Settings" Foreground="#FFFFFF" FontWeight="Bold"/>
+                                    <CheckBox Content="Enable Auto Blinking" IsChecked="{Binding IsEnabled}"/>
+                                    <Grid ColumnDefinitions="*, *, *" IsEnabled="{Binding IsEnabled}">
+                                        <StackPanel Grid.Column="0" Margin="0,0,5,0">
+                                            <TextBlock Text="Target Animation Name" Foreground="#AAAAAA" FontSize="12"/>
+                                            <TextBox Text="{Binding TargetAnimationName}"/>
+                                        </StackPanel>
+                                        <StackPanel Grid.Column="1" Margin="5,0,5,0">
+                                            <TextBlock Text="Min Interval (ms)" Foreground="#AAAAAA" FontSize="12"/>
+                                            <NumericUpDown Value="{Binding MinIntervalMs}" Increment="100"/>
+                                        </StackPanel>
+                                        <StackPanel Grid.Column="2" Margin="5,0,0,0">
+                                            <TextBlock Text="Max Interval (ms)" Foreground="#AAAAAA" FontSize="12"/>
+                                            <NumericUpDown Value="{Binding MaxIntervalMs}" Increment="100"/>
+                                        </StackPanel>
+                                    </Grid>
+                                    <Grid ColumnDefinitions="*, *" IsEnabled="{Binding IsEnabled}">
+                                        <StackPanel Grid.Column="0" Margin="0,0,5,0">
+                                            <TextBlock Text="Blink Duration (ms)" Foreground="#AAAAAA" FontSize="12"/>
+                                            <NumericUpDown Value="{Binding DurationMs}" Increment="10"/>
+                                        </StackPanel>
+                                        <StackPanel Grid.Column="1" Margin="5,0,0,0">
+                                            <TextBlock Text="Consecutive Blinks" Foreground="#AAAAAA" FontSize="12"/>
+                                            <NumericUpDown Value="{Binding ConsecutiveBlinks}" Increment="1" Minimum="1"/>
+                                        </StackPanel>
+                                    </Grid>
                                 </StackPanel>
                             </Border>
                         </Grid>

@@ -10,12 +10,15 @@ using System.Threading.Tasks;
 using PNGTA.Services;
 using System.Collections.ObjectModel;
 using PNGTA.Models;
+using System.Reflection; // Asegura soporte para reflexión
 
 namespace PNGTA.Views;
 
 public partial class MainWindow : Window
 {
     private Control? _draggedItem;
+    private bool _isDraggingCanvasLayer = false;
+    private Point _lastPointerPosition;
 
     public MainWindow()
     {
@@ -76,6 +79,44 @@ public partial class MainWindow : Window
         return IsDescendant(parent, potentialChild.Parent);
     }
 
+    private void OnCanvasLayerPointerPressed(object sender, PointerPressedEventArgs e)
+    {
+        if (sender is Control control && control.Tag is LayerModel layer && !layer.IsLocked)
+        {
+            if (DataContext is MainViewModel vm)
+            {
+                vm.SelectedLayer = layer;
+            }
+
+            _isDraggingCanvasLayer = true;
+            _lastPointerPosition = e.GetPosition(this);
+            e.Handled = true;
+        }
+    }
+
+    protected override void OnPointerMoved(PointerEventArgs e)
+    {
+        base.OnPointerMoved(e);
+        
+        if (_isDraggingCanvasLayer && DataContext is MainViewModel vm && vm.SelectedLayer != null && !vm.SelectedLayer.IsLocked)
+        {
+            var currentPosition = e.GetPosition(this);
+            var deltaX = currentPosition.X - _lastPointerPosition.X;
+            var deltaY = currentPosition.Y - _lastPointerPosition.Y;
+
+            vm.SelectedLayer.PositionX += deltaX;
+            vm.SelectedLayer.PositionY += deltaY;
+
+            _lastPointerPosition = currentPosition;
+        }
+    }
+
+    protected override void OnPointerReleased(PointerReleasedEventArgs e)
+    {
+        base.OnPointerReleased(e);
+        _isDraggingCanvasLayer = false;
+    }
+
     private void OnStateCardPointerPressed(object? sender, PointerPressedEventArgs e)
     {
         if (sender is Border border && border.Tag is string stateName)
@@ -127,6 +168,38 @@ public partial class MainWindow : Window
             }
             catch 
             {
+            }
+        }
+    }
+
+    private async void OnBrowseFrameImageClick(object? sender, RoutedEventArgs e)
+    {
+        var topLevel = TopLevel.GetTopLevel(this);
+        if (topLevel == null) return;
+
+        var files = await topLevel.StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
+        {
+            Title = "Select Frame Image Override",
+            AllowMultiple = false,
+            FileTypeFilter = new[]
+            {
+                new FilePickerFileType("Images") { Patterns = new[] { "*.png", "*.jpg", "*.jpeg", "*.gif", "*.webp" } }
+            }
+        });
+
+        if (files.Count >= 1)
+        {
+            var button = sender as Button;
+            var frameContext = button?.DataContext;
+
+            if (frameContext != null)
+            {
+                // Usa reflexión para encontrar la propiedad 'ImagePath' sin importar el nombre exacto de la clase del modelo
+                var imagePathProperty = frameContext.GetType().GetProperty("ImagePath");
+                if (imagePathProperty != null && imagePathProperty.CanWrite)
+                {
+                    imagePathProperty.SetValue(frameContext, files[0].Path.LocalPath);
+                }
             }
         }
     }
